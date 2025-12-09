@@ -1,0 +1,8 @@
+pip install langchain langchain-core langchain-community
+pip install langgraph
+pip install google-generativeai
+pip install python-dotenv
+pip install pydantic
+pip install chromadb
+pip install faiss-cpu
+pip install huggingface_hub
