@@ -1,0 +1,179 @@
+MAKA(Multi agent Knowledge Assistant)/
+│
+├── app/
+│   ├── api/
+│   │   ├── v1/
+│   │   │   ├── chat.py
+│   │   │   ├── rag.py
+│   │   │   ├── agents.py
+│   │   │   └── health.py
+│   │   └── __init__.py
+│   │
+│   ├── core/
+│   │   ├── config.py
+│   │   ├── logging_config.py
+│   │   └── constants.py
+│   │
+│   ├── models/         # Pydantic models (Request/Response)
+│   │   ├── chat_models.py
+│   │   ├── rag_models.py
+│   │   └── agent_models.py
+│   │
+│   ├── services/
+│   │   ├── llm/
+│   │   │   ├── openai_service.py
+│   │   │   ├── gemini_service.py
+│   │   │   └── ollama_service.py
+│   │   │
+│   │   ├── memory/
+│   │   │   ├── short_term.py
+│   │   │   ├── long_term.py
+│   │   │   └── episodic.py
+│   │   │
+│   │   ├── rag/
+│   │   │   ├── ingest.py
+│   │   │   ├── retriever.py
+│   │   │   └── chunker.py
+│   │   │
+│   │   ├── agents/
+│   │   │   ├── planner_agent.py
+│   │   │   ├── code_agent.py
+│   │   │   ├── rag_agent.py
+│   │   │   ├── reviewer_agent.py
+│   │   │   └── supervisor_agent.py
+│   │   │
+│   │   └── utils/
+│   │       ├── text_utils.py
+│   │       ├── token_utils.py
+│   │       └── file_utils.py
+│   │
+│   ├── workflows/
+│   │   ├── multi_agent_graph.py
+│   │   ├── rag_graph.py
+│   │   └── memory_graph.py
+│   │
+│   ├── db/
+│   │   ├── database.py
+│   │   ├── postgres_connection.py
+│   │   ├── schemas.sql
+│   │   └── migrations/
+│   │
+│   ├── main.py          # FastAPI entry point
+│   └── __init__.py
+│
+├── data/
+│   ├── docs/            # PDFs, PPTs, manuals for RAG
+│   ├── embeddings/      # Local FAISS / Chroma indexes
+│   └── memory/          # Episodic or long-term summary files
+│
+├── docker/
+│   ├── Dockerfile
+│   ├── docker-compose.yml
+│   └── env.example
+│
+├── tests/
+│   ├── test_api.py
+│   ├── test_agents.py
+│   └── test_rag.py
+│
+├── .env                 # Real environment variables
+├── .gitignore
+├── requirements.txt
+└── README.md
+
+
+
+🧩 EXPLANATION OF IMPORTANT FOLDERS
+🔹 app/api/v1/
+
+FastAPI endpoints:
+
+File	Use
+chat.py	Multi-agent chat endpoint (/chat)
+rag.py	RAG search endpoint (/rag)
+agents.py	Expose agent behaviour for debugging
+health.py	/health endpoint
+🔹 app/services/llm/
+
+LLM provider logic:
+
+openai_service.py → GPT-4o, mini
+
+gemini_service.py → Gemini Flash & Pro
+
+ollama_service.py → LLaMA / Mistral local models
+
+This allows:
+✔ model fallback
+✔ switching between providers
+✔ backup emergency local model
+
+🔹 app/services/agents/
+
+Each agent separated:
+
+Planner Agent
+
+RAG Agent
+
+Code Agent
+
+Reviewer Agent
+
+Supervisor Agent
+
+🔹 app/workflows/
+
+LangGraph workflows:
+
+File	Use
+multi_agent_graph.py	Main multi-agent pipeline
+rag_graph.py	RAG-only pipeline
+memory_graph.py	Memory summarisation routines
+🔹 app/db/
+
+Database layer:
+
+database.py                → session manager
+postgres_connection.py     → connection code
+schemas.sql                → table definitions
+migrations/                → schema migration files
+
+
+Tables typically include:
+
+users
+
+threads
+
+messages
+
+vector_metadata
+
+episodic_memory
+
+🔹 docker/
+
+For deployment:
+
+Dockerfile
+
+docker-compose
+
+env.example
+
+Makes deployment extremely easy on free hosts.
+
+🌐 main.py — FastAPI entry point
+
+This launches the server:
+
+from fastapi import FastAPI
+from app.api.v1 import chat, rag, agents, health
+
+app = FastAPI()
+
+app.include_router(chat.router, prefix="/api/v1/chat")
+app.include_router(rag.router, prefix="/api/v1/rag")
+app.include_router(agents.router, prefix="/api/v1/agents")
+app.include_router(health.router, prefix="/api/v1/health")
